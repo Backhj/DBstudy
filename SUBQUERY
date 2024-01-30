@@ -1,0 +1,42 @@
+SELECT *
+FROM member;
+
+SELECT *
+FROM prod;
+
+SELECT a.mem_id
+      ,a.mem_name
+      ,b.cart_no
+      ,b.cart_prod
+      ,b.cart_qty  
+FROM member a
+    ,cart b
+WHERE a.mem_id = b.cart_member
+AND a.mem_name = '김은대'; 
+
+--카트사용횟수, 구매상품품목수, 총구매상품수,총구매금액
+SELECT a.mem_id
+      ,a.mem_name
+      ,COUNT(DISTINCT b.cart_no)   as 카트사용횟수 //DISTINCT는 중복 없애기
+      ,COUNT(DISTINCT b.cart_prod) as 구매상품품목수
+      ,SUM(NVL(b.cart_qty,0))      as 총구매상품수  
+FROM member a
+    ,cart b
+    
+WHERE a.mem_id = b.cart_member(+)
+AND a.mem_name = '김은대' 
+GROUP BY a.mem_id
+        ,a.mem_name;
+        
+        
+        SELECT a.mem_id
+      ,a.mem_name
+      ,COUNT(DISTINCT b.cart_no) as 카트사용횟수
+      ,COUNT(DISTINCT b.cart_prod) as 구매상품품목수
+      ,SUM(NVL(b.cart_qty, 0)) as 총구매상품수  
+      ,SUM(prod_sale)as 총구매금액
+FROM member a, cart b ,prod c
+WHERE a.mem_id = b.cart_member(+)
+AND b.cart_prod = c.prod_id(+)
+AND a.mem_name = '김은대' 
+GROUP BY a.mem_id, a.mem_name;
