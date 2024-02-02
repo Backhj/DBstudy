@@ -1,0 +1,103 @@
+/*
+ STUDY 계정에 create_table 스크립트를 실해하여 
+ 테이블 생성후 1~ 5 데이터를 임포트한 뒤 
+ 아래 문제를 출력하시오 
+ (문제에 대한 출력물은 이미지 참고)
+*/
+SELECT * 
+FROM address;
+
+SELECT * 
+FROM customer;
+
+SELECT * 
+FROM item;
+
+SELECT * 
+FROM order_info;
+
+SELECT * 
+FROM reservation;
+-----------1번 문제 ---------------------------------------------------
+--1988년 이후 출생자의 직업이 의사,자영업 고객을 출력하시오 (어린 고객부터 출력)
+SELECT *
+FROM customer
+WHERE BIRTH >= 1988
+AND JOB IN ('의사', '자영업')
+ORDER BY BIRTH DESC;
+
+---------------------------------------------------------------------
+-----------2번 문제 ---------------------------------------------------
+--강남구에 사는 고객의 이름, 전화번호를 출력하시오 
+---------------------------------------------------------------------
+SELECT * 
+FROM address;
+
+SELECT * 
+FROM customer;
+
+SELECT c.customer_name, c.phone_number
+FROM customer c
+JOIN address a ON c.zip_code = a.zip_code
+WHERE a.address_detail LIKE '%강남구%';
+----------3번 문제 ---------------------------------------------------
+--CUSTOMER에 있는 회원의 직업별 회원의 수를 출력하시오 (직업 NULL은 제외)
+---------------------------------------------------------------------
+SELECT job, COUNT(*) AS CNT
+FROM customer
+WHERE job IS NOT NULL
+GROUP BY job;
+----------4-1번 문제 ---------------------------------------------------
+-- 가장 많이 가입(처음등록)한 요일과 건수를 출력하시오 
+---------------------------------------------------------------------
+SELECT *
+FROM customer;
+
+
+SELECT 요일, 건수
+FROM (
+    SELECT TO_CHAR(first_reg_date, 'DY') AS 요일
+         , COUNT(*) AS 건수
+    FROM customer
+    GROUP BY TO_CHAR(first_reg_date, 'DY')
+    ORDER BY 건수 DESC
+)
+WHERE ROWNUM = 1;
+----------4-2번 문제 ---------------------------------------------------
+-- 남녀 인원수를 출력하시오 
+---------------------------------------------------------------------
+SELECT sex_code as gender,COUNT(*) as CNT 
+FROM customer
+GROUP BY sex_code;
+
+SELECT
+  CASE
+    WHEN GROUPING(sex_code) = 1 THEN '합계'
+    WHEN sex_code = 'M' THEN '남자'
+    WHEN sex_code = 'F' THEN '여자'
+    ELSE '미등록'
+  END as gender,
+  COUNT(*) as CNT
+FROM customer
+GROUP BY ROLLUP(sex_code);
+----------5번 문제 ---------------------------------------------------
+--월별 예약 취소 건수를 출력하시오 (많은 달 부터 출력)
+---------------------------------------------------------------------
+SELECT * 
+FROM customer;
+
+SELECT * 
+FROM reservation;
+
+SELECT 월, 취소건수
+FROM (
+    SELECT SUBSTR(reserv_date, 5,2) AS 월
+         , COUNT(*) AS 취소건수
+    FROM reservation
+    WHERE cancel LIKE '%Y%' 
+    GROUP BY SUBSTR(reserv_date, 5,2)
+    ORDER BY 취소건수 DESC
+);
+
+
+
